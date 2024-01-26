@@ -1,4 +1,4 @@
-import { executePlugin, getPlugin, plugins } from './index.js'
+import { executePlugin, getPlugin, getTxIntent, plugins, type IntentParams } from './index.js'
 import {
   type ActionParams,
   ActionType,
@@ -23,6 +23,28 @@ describe('getPlugin', () => {
 
   test('should throw an error for unknown plugin', () => {
     expect(() => getPlugin('unknown')).toThrow('Unknown plugin "unknown"')
+  })
+})
+
+describe('getTxIntent', () => {
+  const mockParams = { actionType: ActionType.Swap } as IntentParams
+
+  test('should call the correct action', () => {
+    const mockPlugin = {
+      getTxIntent: vi.fn(),
+    } as unknown //as IActionPlugin
+
+    getTxIntent(mockPlugin, mockParams)
+    expect(mockPlugin.getTxIntent).toHaveBeenCalledWith(mockPlugin, mockParams)
+  })
+
+  test('should throw an error for unknown action type', () => {
+    const mockPlugin = {
+      getTxIntent: vi.fn(),
+    } as unknown as IActionPlugin
+
+    const unknownParams = { actionType: 'unknown' } as IntentParams
+    expect(() => getTxIntent(mockPlugin, unknownParams)).toThrow('Unknown action type "unknown"')
   })
 })
 

@@ -11,6 +11,7 @@ import {
   type DelegateActionParams,
   type TransactionFilter,
   type StakeActionParams,
+  type FilterOperator,
 } from '@rabbitholegg/questdk'
 
 import { Connext } from '@rabbitholegg/questdk-plugin-connext'
@@ -44,6 +45,7 @@ import { Soundxyz } from '@rabbitholegg/questdk-plugin-soundxyz'
 import { Vela } from '@rabbitholegg/questdk-plugin-vela'
 import { Mux } from '@rabbitholegg/questdk-plugin-mux'
 import { ENTRYPOINT } from './contract-addresses'
+import type { Address } from 'viem'
 
 export const plugins: Record<string, IActionPlugin> = {
   [Connext.pluginId]: Connext,
@@ -84,6 +86,29 @@ export const getPlugin = (pluginId: string) => {
     throw new Error(`Unknown plugin "${pluginId}"`)
   }
   return plugin
+}
+
+// TODO: Relocate this to SDK and narrow the type
+//       We want to have plugin specific intent params collapse into action specific params
+export type IntentParams = SwapIntentParams
+
+
+export type SwapIntentParams = {
+  actionType: ActionType.Swap
+  contractAddress: Address
+  tokenId?: number
+  amount?: number | FilterOperator
+  recipient?: Address
+}
+
+export const getTxIntent = (pluginId: IActionPlugin, params: IntentParams) => {
+  switch(params.actionType) {
+    case ActionType.Swap:
+      //pluginId.getTxIntent(pluginId, params)
+      return 0;
+    default:
+      throw new Error(`Unknown action type "${params.actionType}"`)
+  }
 }
 
 export const executePlugin = (
